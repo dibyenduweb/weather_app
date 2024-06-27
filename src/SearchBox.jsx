@@ -1,11 +1,13 @@
+/* eslint-disable no-useless-catch */
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import "./SearchBox.css";
 import { useState } from "react";
 
+// eslint-disable-next-line react/prop-types
 export default function SearchBox({ updateInfo }) {
   let [city, setCity] = useState("");
-  let [err, setErr] = useState(false);
+  let [error, setError] = useState(false);
   const API_URL = "https://api.openweathermap.org/data/2.5/weather";
   const API_KEY = "15332e044278e8b46c851e48b23b9485";
 
@@ -14,7 +16,11 @@ export default function SearchBox({ updateInfo }) {
       let response = await fetch(
         `${API_URL}?q=${city}&appid=${API_KEY}&units=metric`
       );
+      if (!response.ok) {
+        throw new Error("Failed to fetch");
+      }
       let jsonResponse = await response.json();
+
       let result = {
         city: city,
         temp: jsonResponse.main.temp,
@@ -26,23 +32,26 @@ export default function SearchBox({ updateInfo }) {
       console.log(result);
       return result;
     } catch (err) {
-      throw err
+      throw err;
     }
   };
 
   let handleChange = (evt) => {
     setCity(evt.target.value);
+    if (error) {
+      setError(false);
+    }
   };
+
   let handleSubmit = async (evt) => {
+    evt.preventDefault();
     try {
-      evt.preventDefault();
       console.log(city);
-      setCity("");
-      await getWeatherInfo();
       let newInfo = await getWeatherInfo();
+      setCity("");
       updateInfo(newInfo);
     } catch (err) {
-      setErr(true);
+      setError(true);
     }
   };
 
@@ -64,7 +73,7 @@ export default function SearchBox({ updateInfo }) {
           <Button variant="contained" type="submit">
             Search
           </Button>
-          {err && <p>No suc plase exit</p>}
+          {error && <p>No such place exists.</p>}
         </form>
       </div>
     </>
