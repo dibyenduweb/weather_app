@@ -1,3 +1,9 @@
 .SearchBox{
 text-align: center;
+margin-bottom: 25px;
+}
+.cardContainer{
+    display: flex;
+    justify-content: center;
+
 }
